@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import React from 'react'
 import { BsBarChartFill, BsFillLightningChargeFill, BsStars } from 'react-icons/bs'
 import { FaArrowRightLong, FaBoltLightning } from 'react-icons/fa6'
@@ -158,11 +159,11 @@ const Hero = (props: Props) => {
                     </p>
                 </div>
 
-                <button className='w-[85%] md:w-[32%] py-2 text-white bg-[#0B7A60] hover:bg-[#0E8F70] rounded-lg cursor-pointer transition duration-200 flex gap-4 justify-center items-center shadow'>
+                <Link href={'/interview'} className='w-[85%] md:w-[32%] py-2 text-white bg-[#0B7A60] hover:bg-[#0E8F70] rounded-lg cursor-pointer transition duration-200 flex gap-4 justify-center items-center shadow'>
                     <BsStars />
                     Create My Interview
                     <FaArrowRightLong />
-                </button>
+                </Link>
 
                 <div>
                     <p className='text-sm text-gray-500'>
