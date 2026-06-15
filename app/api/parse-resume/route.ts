@@ -75,9 +75,6 @@ export async function POST(req: NextRequest) {
 
     const parsedResume = JSON.parse(text);
 
-    console.log("PARSED RESUME:");
-    console.log(parsedResume);
-
     return NextResponse.json(parsedResume);
   } catch (error) {
     console.error("Resume Parsing Error:", error);
