@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import Toast from "./components/Toast";
 
 export const metadata: Metadata = {
   title: "PrepMate",
@@ -14,7 +15,10 @@ export default function RootLayout({
   return (
     <html
       lang="en">
-      <body>{children}</body>
+      <body>
+        {children}
+        <Toast />
+      </body>
     </html>
   );
 }
