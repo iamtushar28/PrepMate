@@ -1,10 +1,11 @@
 import Link from 'next/link'
 import React from 'react'
-import { BsBarChartFill, BsFillLightningChargeFill, BsStars } from 'react-icons/bs'
-import { FaArrowRightLong, FaBoltLightning } from 'react-icons/fa6'
+import { BsFillLightningChargeFill, BsStars } from 'react-icons/bs'
+import { FaArrowRightLong } from 'react-icons/fa6'
 import { GoShieldCheck } from 'react-icons/go'
-import { MdKeyboardVoice, MdOutlineTipsAndUpdates } from 'react-icons/md'
-import { PiUserFocusFill } from 'react-icons/pi'
+import { MdOutlineTipsAndUpdates } from 'react-icons/md'
+import Header from './Header'
+import Features from './Features'
 
 type Props = {}
 
@@ -13,28 +14,7 @@ const Hero = (props: Props) => {
         <div className='pt-24 pb-8 px-4 min-h-screen h-auto w-full flex flex-col gap-6 justify-center items-center'>
 
             {/* heading section */}
-            <div className='flex flex-col gap-5 justify-center items-center'>
-
-                {/* brand strip */}
-                <div className='px-8 py-2 w-fit text-sm text-[#0B7A60] border border-[#B7E4D7] bg-[#F4FBF8] rounded-full flex gap-2 justify-center items-center'>
-                    <BsStars />
-                    <p>AI-Powered Interview Preparation</p>
-                </div>
-
-                {/* brand title */}
-                <div className='flex flex-col gap-2 items-center'>
-
-                    <h2 className='text-4xl md:text-5xl font-semibold text-center'>
-                        Your Personal AI Interviewer
-                    </h2>
-
-                    <p className='w-full md:w-132 text-sm md:text-base text-gray-500 text-center'>
-                        Paste the job description, upload your resume (optional) and get ready for a personalized, voice-to-voice interview experience.
-                    </p>
-
-                </div>
-
-            </div>
+            <Header />
 
             {/* input section */}
             <div className='w-full flex gap-6 flex-col md:flex-row justify-center items-center'>
@@ -174,90 +154,7 @@ const Hero = (props: Props) => {
             </div>
 
             {/* features section */}
-            <div className='w-full md:w-[78%] h-auto p-5 bg-white border border-gray-200 rounded-lg flex flex-wrap gap-6 md:gap-0 justify-between items-center'>
-
-                <div className='flex gap-2 items-center'>
-
-                    {/* icon */}
-                    <div className='h-10 w-10 text-xl text-[#0B7A60] bg-gray-100 rounded-full flex justify-center items-center'>
-                        <PiUserFocusFill />
-                    </div>
-
-                    <div>
-                        <p className='font-semibold'>
-                            Personalize
-                        </p>
-                        <p className='text-sm text-gray-500'>
-                            Tailored questions <br /> just for you
-                        </p>
-                    </div>
-
-                </div>
-
-                {/* devider */}
-                <div className='hidden md:block h-14 w-px bg-gray-200'></div>
-
-                <div className='flex gap-2 items-center'>
-
-                    {/* icon */}
-                    <div className='h-10 w-10 text-xl text-[#0B7A60] bg-gray-100 rounded-full flex justify-center items-center'>
-                        <MdKeyboardVoice />
-                    </div>
-
-                    <div>
-                        <p className='font-semibold'>
-                            Voice to Voice
-                        </p>
-                        <p className='text-sm text-gray-500'>
-                            Real Conversational <br /> practice
-                        </p>
-                    </div>
-
-                </div>
-
-                {/* devider */}
-                <div className='hidden md:block h-14 w-px bg-gray-200'></div>
-
-                <div className='flex gap-2 items-center'>
-
-                    {/* icon */}
-                    <div className='h-10 w-10 text-lg text-[#0B7A60] bg-gray-100 rounded-full flex justify-center items-center'>
-                        <BsBarChartFill />
-                    </div>
-
-                    <div>
-                        <p className='font-semibold'>
-                            Smart Feedback
-                        </p>
-                        <p className='text-sm text-gray-500'>
-                            Get detailed insights <br /> & score
-                        </p>
-                    </div>
-
-                </div>
-
-                {/* devider */}
-                <div className='hidden md:block h-14 w-px bg-gray-200'></div>
-
-                <div className='flex gap-2 items-center'>
-
-                    {/* icon */}
-                    <div className='h-10 w-10 text-lg text-[#0B7A60] bg-gray-100 rounded-full flex justify-center items-center'>
-                        <FaBoltLightning />
-                    </div>
-
-                    <div>
-                        <p className='font-semibold'>
-                            Improve Faster
-                        </p>
-                        <p className='text-sm text-gray-500'>
-                            Practice. Analyze. <br /> Improve.
-                        </p>
-                    </div>
-
-                </div>
-
-            </div>
+            <Features />
 
         </div>
     )
