@@ -11,7 +11,7 @@ export default function Toast() {
     return (
         <div
             className={`
-                fixed top-22 right-6 z-50
+                fixed top-22 right-4 z-50
 
                 min-w-72 h-12 px-4
 

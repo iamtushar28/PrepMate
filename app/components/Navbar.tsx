@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import React from 'react'
 import { FaArrowRightLong } from 'react-icons/fa6'
 
@@ -16,14 +17,10 @@ const Navbar = (props: Props) => {
             {/* create account section */}
             <div className='flex gap-4'>
 
-                <button className='hidden md:block px-4 py-2 hover:bg-[#F4FBF8] rounded cursor-pointer transition duration-200'>
-                    Login
-                </button>
-
-                <button className='px-4 py-2 text-sm md:text-base text-white bg-[#0B7A60] hover:bg-[#0E8F70] rounded cursor-pointer transition duration-200 flex gap-2 items-center'>
+                <Link href={'/signin'} className='px-4 py-2 text-sm md:text-base text-white bg-[#0B7A60] hover:bg-[#0E8F70] rounded cursor-pointer transition duration-200 flex gap-2 items-center'>
                     Get Started Free
                     <FaArrowRightLong />
-                </button>
+                </Link>
 
             </div>
 
