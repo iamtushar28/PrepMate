@@ -64,7 +64,7 @@ const ProfileVisual = (props: Props) => {
             </div>
 
             {/* audio feature card */}
-            <div className='hidden md:flex h-12 w-35 text-[#0B7A60] bg-[] border border-[#B7E4D7] bg-white rounded-xl absolute -left-4 bottom-8 items-center shadow-lg'>
+            <div className='flex h-12 w-35 text-[#0B7A60] border border-[#B7E4D7] bg-white rounded-xl absolute -left-4 bottom-8 items-center shadow-lg'>
 
                 <div className='h-12 w-10 flex justify-center items-center'>
                     <FaMicrophone size={18} />
@@ -77,7 +77,7 @@ const ProfileVisual = (props: Props) => {
             </div>
 
             {/* feedback feature card */}
-            <div className='h-12 w-35 text-[#0B7A60] bg-[] border border-[#B7E4D7] bg-white rounded-xl absolute -right-3 md:right-2 -top-4 flex items-center shadow-lg'>
+            <div className='h-12 w-35 text-[#0B7A60] bg-[] border border-[#B7E4D7] bg-white rounded-xl absolute right-2 -top-4 flex items-center shadow-lg'>
 
                 <div className='h-12 w-10 flex justify-center items-center'>
                     <BsBarChartFill size={18} />
@@ -90,7 +90,7 @@ const ProfileVisual = (props: Props) => {
             </div>
 
             {/* feedback feature card */}
-            <div className='h-12 w-35 text-[#0B7A60] bg-[] border border-[#B7E4D7] bg-white rounded-xl absolute -right-3 bottom-3 md:right-2 md:bottom-4 flex items-center shadow-lg'>
+            <div className='h-12 w-35 text-[#0B7A60] bg-[] border border-[#B7E4D7] bg-white rounded-xl absolute right-2 bottom-4 flex items-center shadow-lg'>
 
                 <div className='h-12 w-10 flex justify-center items-center'>
                     <FaUserLarge size={18} />
