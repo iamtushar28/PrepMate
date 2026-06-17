@@ -11,7 +11,7 @@ const Header = (props: Props) => {
         <div className='flex flex-col gap-5 justify-center items-center relative'>
 
             {/* brand strip */}
-            <div className='px-8 py-2 w-fit text-sm text-[#0B7A60] border border-[#B7E4D7] bg-[#F4FBF8] rounded-full flex gap-2 justify-center items-center'>
+            <div className='px-8 py-2 w-fit text-sm text-[#0B7A60] border border-[#B7E4D7] bg-[#F4FBF8] rounded-full flex gap-2 justify-center items-center shadow-sm'>
                 <BsStars />
                 <p>AI-Powered Interview Preparation</p>
             </div>
@@ -20,7 +20,7 @@ const Header = (props: Props) => {
             <div className='flex flex-col gap-2 items-center'>
 
                 <h2 className='text-4xl md:text-5xl font-semibold text-center'>
-                    Your Personal AI Interviewer
+                    Your Personal <span className='text-[#0B7A60]'>AI</span> Interviewer
                 </h2>
 
                 <p className='w-full md:w-132 text-sm md:text-base text-gray-500 text-center'>

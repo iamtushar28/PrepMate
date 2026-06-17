@@ -1,7 +1,7 @@
 import Image from 'next/image'
-import { FcGoogle } from 'react-icons/fc'
 import HeroVisual from './components/HeroVisual'
 import { BsStars } from 'react-icons/bs'
+import GoogleSigninButton from './components/GoogleSigninButton'
 
 type Props = {}
 
@@ -59,10 +59,7 @@ const page = (props: Props) => {
                     </div>
 
                     {/* sign in button */}
-                    <button className='w-[84%] h-11 font-semibold border border-gray-100 bg-white shadow rounded-lg flex gap-3 items-center justify-center'>
-                        <FcGoogle size={23} />
-                        Continue with Google
-                    </button>
+                    <GoogleSigninButton />
 
                 </div>
 

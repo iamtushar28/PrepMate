@@ -1,9 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { GoogleGenAI } from "@google/genai";
-
-const ai = new GoogleGenAI({
-  apiKey: process.env.GEMINI_API_KEY!,
-});
+import { ai } from "@/lib/gemini";
 
 export async function POST(req: NextRequest) {
   try {
@@ -42,7 +38,7 @@ export async function POST(req: NextRequest) {
     const base64Pdf = Buffer.from(bytes).toString("base64");
 
     const response = await ai.models.generateContent({
-      model: "gemini-2.5-flash",
+      model: "gemini-2.5-flash-lite",
       contents: [
         {
           inlineData: {

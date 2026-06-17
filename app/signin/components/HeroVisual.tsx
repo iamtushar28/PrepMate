@@ -2,6 +2,7 @@ import Image from 'next/image'
 import React from 'react'
 import { BsStars } from 'react-icons/bs'
 import ProfileVisual from './ProfileVisual'
+import Link from 'next/link'
 
 type Props = {}
 
@@ -11,7 +12,7 @@ const HeroVisual = (props: Props) => {
         <div className='hidden md:flex w-[50%] h-screen px-6 bg-[#b7e4d728] relative flex-col justify-center items-center'>
 
             {/* logo */}
-            <div className='text-xl md:text-2xl font-semibold flex gap-2 justify-center items-center absolute top-8 left-8'>
+            <Link href={'/'} className='text-xl md:text-2xl font-semibold flex gap-2 justify-center items-center absolute top-8 left-8'>
                 <Image
                     src={'/logo.png'}
                     alt='PrepMate Logo'
@@ -21,7 +22,7 @@ const HeroVisual = (props: Props) => {
                 />
                 <p>PrepMat</p>
                 <p className='text-[#0B7A60] -rotate-12 -ml-2'>e</p>
-            </div>
+            </Link>
 
             {/* visual section */}
             <div className='mt-10'>

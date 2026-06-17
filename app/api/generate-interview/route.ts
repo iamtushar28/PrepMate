@@ -1,16 +1,52 @@
 import { NextRequest, NextResponse } from "next/server";
-import { GoogleGenAI } from "@google/genai";
-
-const ai = new GoogleGenAI({
-  apiKey: process.env.GEMINI_API_KEY!,
-});
+import { adminAuth, adminDb } from "@/lib/firebase-admin";
+import { createInterviewId } from "@/lib/interview-id";
+import { FieldValue } from "firebase-admin/firestore";
+import { ai } from "@/lib/gemini";
 
 export async function POST(req: NextRequest) {
     try {
+        const authHeader =
+            req.headers.get("authorization");
+
+        if (!authHeader?.startsWith("Bearer ")) {
+            return NextResponse.json(
+                {
+                    error:
+                        "Please login to generate an interview",
+                },
+                {
+                    status: 401,
+                }
+            );
+        }
+
+        const token =
+            authHeader.split("Bearer ")[1];
+
+        let decodedToken;
+
+        try {
+            decodedToken =
+                await adminAuth.verifyIdToken(
+                    token
+                );
+        } catch {
+            return NextResponse.json(
+                {
+                    error:
+                        "Please login to generate an interview",
+                },
+                {
+                    status: 401,
+                }
+            );
+        }
+
         const { jobDescription, resume } =
             await req.json();
 
-        const prompt = `
+       const prompt = `
 Generate a personalized mock interview.
 
 Job Description:
@@ -37,17 +73,17 @@ Rules:
 
 Format:
 {
- "estimatedLevel": "",
+  "estimatedLevel": "",
   "technical": ["question"],
   "project": ["question"],
   "behavioral": ["question"]
 }
-  estimatedLevel should be the most likely target role inferred from the job description and candidate profile.
+estimatedLevel should be the most likely target role inferred from the job description and candidate profile.
 `;
 
         const result =
             await ai.models.generateContent({
-                model: "gemini-2.5-flash",
+                model: "gemini-2.5-flash-lite",
                 contents: prompt,
             });
 
@@ -55,19 +91,61 @@ Format:
             result.text
                 ?.replace(/```json/g, "")
                 .replace(/```/g, "")
-                .trim() || "[]";
+                .trim() || "{}";
 
-        const questions = JSON.parse(text);
+        const generated =
+            JSON.parse(text);
 
-        return NextResponse.json(questions);
-    }
-    catch (error) {
+        const interviewId =
+            createInterviewId(
+                generated.estimatedLevel ||
+                    "software-engineer"
+            );
+
+        await adminDb
+            .collection("interviews")
+            .doc(interviewId)
+            .set({
+                id: interviewId,
+
+                userId: decodedToken.uid,
+
+                status: "created",
+
+                estimatedLevel:
+                    generated.estimatedLevel,
+
+                questions: {
+                    technical:
+                        generated.technical ||
+                        [],
+                    project:
+                        generated.project || [],
+                    behavioral:
+                        generated.behavioral ||
+                        [],
+                },
+
+                evaluation: null,
+
+                createdAt:
+                    FieldValue.serverTimestamp(),
+
+                startedAt: null,
+
+                completedAt: null,
+            });
+
+        return NextResponse.json({
+            interviewId,
+        });
+    } catch (error) {
         console.error(error);
 
         return NextResponse.json(
             {
                 error:
-                    "Failed to generate interview questions",
+                    "Failed to create interview",
             },
             {
                 status: 500,

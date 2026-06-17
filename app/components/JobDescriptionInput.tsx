@@ -29,6 +29,12 @@ export default function JobDescriptionInput() {
         }
     };
 
+    const SAMPLE_JD = `Seeking a Frontend Developer Fresher with knowledge of HTML, CSS, JavaScript, React.js, and responsive design. The candidate will assist in developing and maintaining modern web applications, collaborate with team members, and learn best practices in frontend development.`;
+
+    const handleSampleJD = () => {
+        setJobDescription(SAMPLE_JD);
+    };
+
     return (
         <div className="w-full md:w-[38%] h-auto p-5 border border-gray-200 bg-white rounded-2xl flex flex-col gap-4 relative shadow-xs">
             {/* Header */}
@@ -51,8 +57,9 @@ export default function JobDescriptionInput() {
 
             {/* Sample JD */}
             <button
+                onClick={handleSampleJD}
                 type="button"
-                className="hidden md:block w-fit px-3 py-1 text-xs font-semibold text-[#0B7A60] border border-gray-200 hover:bg-[#F4FBF8] rounded absolute top-4 right-4 transition duration-200"
+                className="hidden md:block w-fit px-3 py-1 text-xs font-semibold text-[#0B7A60] border border-gray-200 hover:bg-[#F4FBF8] rounded absolute top-4 right-4 transition duration-200 cursor-pointer"
             >
                 Sample JD
             </button>
@@ -70,8 +77,8 @@ export default function JobDescriptionInput() {
                 <div className="flex justify-end mt-1">
                     <span
                         className={`text-xs ${wordCount > 450
-                                ? "text-orange-500"
-                                : "text-gray-400"
+                            ? "text-orange-500"
+                            : "text-gray-400"
                             }`}
                     >
                         {wordCount}/{MAX_JD_WORDS} words

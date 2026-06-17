@@ -4,17 +4,24 @@ import { useState } from 'react'
 import { useInterviewStore } from "@/store/interview-store";
 import { BsFillLightningChargeFill, BsStars } from 'react-icons/bs'
 import { FaArrowRightLong } from 'react-icons/fa6'
-
 import Header from './Header'
 import Features from './Features'
 import ResumeUpload from './ResumeUpload'
 import JobDescriptionInput from './JobDescriptionInput'
 import { PiSpinnerBold } from 'react-icons/pi';
 import { useToastStore } from '@/store/toast-store';
+import { useAuthStore } from '@/store/authStore';
+import { auth } from '@/firebase/firebase';
+import { useRouter } from 'next/navigation';
 
 type Props = {}
 
+const token = await auth.currentUser?.getIdToken();
+
 const Hero = (props: Props) => {
+
+    const router = useRouter();
+    const { user, loading } = useAuthStore();
 
     const {
         jobDescription,
@@ -81,8 +88,21 @@ const Hero = (props: Props) => {
     };
 
     const handleCreateInterview = async () => {
+        if (loading) return;
+
+        if (!user) {
+            showToast(
+                "Please login first to generate an interview",
+                "error"
+            );
+            return;
+        }
+
         try {
             setIsGeneratingInterview(true);
+
+            const token =
+                await auth.currentUser?.getIdToken();
 
             const response = await fetch(
                 "/api/generate-interview",
@@ -91,6 +111,8 @@ const Hero = (props: Props) => {
                     headers: {
                         "Content-Type":
                             "application/json",
+                        Authorization:
+                            `Bearer ${token}`,
                     },
                     body: JSON.stringify({
                         jobDescription,
@@ -104,14 +126,13 @@ const Hero = (props: Props) => {
             if (!response.ok) {
                 throw new Error(
                     data.error ||
-                    "Failed to generate interview"
+                    "Failed to create interview"
                 );
             }
 
-            console.log(
-                "Generated Interview Questions:"
+            router.push(
+                `/interview/${data.interviewId}`
             );
-            console.log(data);
 
         } catch (error) {
             showToast(
@@ -152,20 +173,7 @@ const Hero = (props: Props) => {
                 <button
                     onClick={handleCreateInterview}
                     disabled={!canGenerate}
-                    className="
-        w-[85%] md:w-[32%]
-        py-2
-        rounded-lg
-        transition duration-200
-        flex gap-4 justify-center items-center
-        shadow
-        bg-[#0B7A60]
-        text-white
-         enabled:cursor-pointer
-        enabled:hover:bg-[#0E8F70]
-        disabled:cursor-not-allowed
-        disabled:opacity-60
-    "
+                    className="w-[85%] md:w-[32%] py-2 rounded-lg transition duration-200 flex gap-4 justify-center items-center shadow bg-[#0B7A60] text-white enabled:cursor-pointer enabled:hover:bg-[#0E8F70] disabled:cursor-not-allowed disabled:opacity-60"
                 >
                     {
                         !isGeneratingInterview && <BsStars />
