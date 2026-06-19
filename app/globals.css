@@ -3,3 +3,21 @@
 body {
   font-family: Arial, Helvetica, sans-serif;
 }
+
+@keyframes voice-wave {
+  0%,
+  100% {
+    transform: scaleY(0.35);
+    opacity: 0.4;
+  }
+
+  50% {
+    transform: scaleY(1);
+    opacity: 1;
+  }
+}
+
+.voice-bar {
+  transform-origin: center;
+  animation: voice-wave 4.4s ease-in-out infinite;
+}

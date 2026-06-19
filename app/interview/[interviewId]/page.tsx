@@ -9,11 +9,10 @@ export default async function Page({
     const { interviewId } = await params;
 
     return (
-        <section className="min-h-screen h-auto w-full">
+        <section className="min-h-screen h-auto w-full bg-zinc-50/50">
             <InterviewNavbar />
 
             <InterviewHome
-                interviewId={interviewId}
             />
         </section>
     );

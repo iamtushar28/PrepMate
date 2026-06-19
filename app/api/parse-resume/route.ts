@@ -1,6 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
 import { ai } from "@/lib/gemini";
 
+function extractJson(text: string) {
+  const cleaned = text
+    .trim()
+    .replace(/^```json\s*/i, "")
+    .replace(/^```\s*/i, "")
+    .replace(/\s*```$/i, "");
+
+  return JSON.parse(cleaned);
+}
+
 export async function POST(req: NextRequest) {
   try {
     const formData = await req.formData();
@@ -14,7 +24,6 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Validate PDF
     if (file.type !== "application/pdf") {
       return NextResponse.json(
         { error: "Only PDF files are allowed" },
@@ -22,8 +31,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Validate size (5MB)
-    const MAX_SIZE = 5 * 1024 * 1024;
+    const MAX_SIZE = 5 * 1024 * 1024; // 5MB
 
     if (file.size > MAX_SIZE) {
       return NextResponse.json(
@@ -32,7 +40,6 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Convert PDF to base64
     const bytes = await file.arrayBuffer();
     const base64Pdf = Buffer.from(bytes).toString("base64");
 
@@ -46,29 +53,44 @@ export async function POST(req: NextRequest) {
           },
         },
         `
-        Parse this resume and return ONLY valid JSON.
+Parse this resume and return the following JSON structure.
 
-        {
-          "name": "",
-          "email": "",
-          "phone": "",
-          "summary": "",
-          "skills": [],
-          "experience": [],
-          "education": [],
-          "projects": []
-        }
+{
+  "name": "",
+  "email": "",
+  "phone": "",
+  "summary": "",
+  "skills": [],
+  "experience": [],
+  "education": [],
+  "projects": []
+}
 
-        Do not return markdown.
-        Do not wrap in \`\`\`json.
-        Return only raw JSON.
-        `,
+Return only JSON.
+`,
       ],
+      config: {
+        responseMimeType: "application/json",
+      },
     });
 
     const text = response.text?.trim() || "{}";
 
-    const parsedResume = JSON.parse(text);
+    let parsedResume;
+
+    try {
+      parsedResume = extractJson(text);
+    } catch (parseError) {
+      console.error("JSON Parse Error:", parseError);
+
+      return NextResponse.json(
+        {
+          error: "Invalid JSON returned by Gemini",
+          rawResponse: text,
+        },
+        { status: 500 }
+      );
+    }
 
     return NextResponse.json(parsedResume);
   } catch (error) {

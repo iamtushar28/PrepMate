@@ -48,6 +48,14 @@ const Hero = (props: Props) => {
     const handleResumeUpload = async (
         file: File
     ): Promise<boolean> => {
+        if (!user) {
+            showToast(
+                "Please login first to upload your resume",
+                "error"
+            );
+            return false;
+        }
+
         try {
             setIsParsingResume(true);
 
