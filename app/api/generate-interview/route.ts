@@ -1,3 +1,4 @@
+export const runtime = "nodejs";
 import { NextRequest, NextResponse } from "next/server";
 import { adminAuth, adminDb } from "@/lib/firebase-admin";
 import { createInterviewId } from "@/lib/interview-id";
@@ -6,16 +7,10 @@ import { ai } from "@/lib/gemini";
 
 export async function POST(req: NextRequest) {
     try {
-        console.log("1. Generate interview route called");
-
         const authHeader =
             req.headers.get("authorization");
 
         if (!authHeader?.startsWith("Bearer ")) {
-            console.log(
-                "2. Missing authorization header"
-            );
-
             return NextResponse.json(
                 {
                     error:
@@ -30,33 +25,14 @@ export async function POST(req: NextRequest) {
         const token =
             authHeader.split("Bearer ")[1];
 
-        console.log(
-            "3. Token received:",
-            !!token
-        );
-
         let decodedToken;
 
         try {
-            console.log(
-                "4. Verifying Firebase token"
-            );
-
             decodedToken =
                 await adminAuth.verifyIdToken(
                     token
                 );
-
-            console.log(
-                "5. Token verified:",
-                decodedToken.uid
-            );
-        } catch (error) {
-            console.error(
-                "Firebase Auth Error:",
-                error
-            );
-
+        } catch {
             return NextResponse.json(
                 {
                     error:
@@ -71,11 +47,7 @@ export async function POST(req: NextRequest) {
         const { jobDescription, resume } =
             await req.json();
 
-        console.log(
-            "6. Request body parsed"
-        );
-
-        const prompt = `
+       const prompt = `
 Generate a personalized mock interview.
 
 Job Description:
@@ -107,11 +79,8 @@ Format:
   "project": ["question"],
   "behavioral": ["question"]
 }
+estimatedLevel should be the most likely target role inferred from the job description and candidate profile.
 `;
-
-        console.log(
-            "7. Calling Gemini"
-        );
 
         const result =
             await ai.models.generateContent({
@@ -119,66 +88,20 @@ Format:
                 contents: prompt,
             });
 
-        console.log(
-            "8. Gemini response received"
-        );
-
         const text =
             result.text
                 ?.replace(/```json/g, "")
                 .replace(/```/g, "")
                 .trim() || "{}";
 
-        console.log(
-            "9. Gemini raw response:",
-            text
-        );
-
-        let generated;
-
-        try {
-            generated = JSON.parse(text);
-
-            console.log(
-                "10. JSON parsed successfully"
-            );
-        } catch (error) {
-            console.error(
-                "JSON Parse Error:",
-                error
-            );
-
-            console.error(
-                "Invalid Gemini Response:",
-                text
-            );
-
-            return NextResponse.json(
-                {
-                    error:
-                        "Gemini returned invalid JSON",
-                    response: text,
-                },
-                {
-                    status: 500,
-                }
-            );
-        }
+        const generated =
+            JSON.parse(text);
 
         const interviewId =
             createInterviewId(
                 generated.estimatedLevel ||
                     "software-engineer"
             );
-
-        console.log(
-            "11. Interview ID created:",
-            interviewId
-        );
-
-        console.log(
-            "12. Writing interview to Firestore"
-        );
 
         await adminDb
             .collection("interviews")
@@ -214,25 +137,15 @@ Format:
                 completedAt: null,
             });
 
-        console.log(
-            "13. Firestore write successful"
-        );
-
         return NextResponse.json({
             interviewId,
         });
-    } catch (error: any) {
-        console.error(
-            "UNHANDLED ERROR:"
-        );
+    } catch (error) {
         console.error(error);
-        console.error(error?.message);
-        console.error(error?.stack);
 
         return NextResponse.json(
             {
                 error:
-                    error?.message ||
                     "Failed to create interview",
             },
             {
