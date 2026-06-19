@@ -34,7 +34,6 @@ export async function POST(req: NextRequest) {
 
     // Convert PDF to base64
     const bytes = await file.arrayBuffer();
-
     const base64Pdf = Buffer.from(bytes).toString("base64");
 
     const response = await ai.models.generateContent({
