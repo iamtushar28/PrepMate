@@ -12,16 +12,15 @@ const HeroVisual = (props: Props) => {
         <div className='hidden md:flex w-[50%] h-screen px-6 bg-[#b7e4d728] relative flex-col justify-center items-center'>
 
             {/* logo */}
-            <Link href={'/'} className='text-xl md:text-2xl font-semibold flex gap-2 justify-center items-center absolute top-8 left-8'>
+            <Link href={'/'} className='text-xl md:text-2xl font-semibold flex justify-center items-center absolute top-8 left-8'>
+                <p>PrepMat</p>
                 <Image
                     src={'/logo.png'}
                     alt='PrepMate Logo'
                     height={100}
                     width={100}
-                    className='h-8 w-8'
+                    className='h-6 w-6 ml-0.5'
                 />
-                <p>PrepMat</p>
-                <p className='text-[#0B7A60] -rotate-12 -ml-2'>e</p>
             </Link>
 
             {/* visual section */}

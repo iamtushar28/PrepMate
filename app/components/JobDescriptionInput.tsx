@@ -2,6 +2,7 @@
 
 import { MdOutlineTipsAndUpdates } from "react-icons/md";
 import { useInterviewStore } from "@/store/interview-store";
+import { LuNotebookText } from "react-icons/lu";
 
 export default function JobDescriptionInput() {
     const { jobDescription, setJobDescription } =
@@ -59,9 +60,10 @@ export default function JobDescriptionInput() {
             <button
                 onClick={handleSampleJD}
                 type="button"
-                className="hidden md:block w-fit px-3 py-1 text-xs font-semibold text-[#0B7A60] border border-gray-200 hover:bg-[#F4FBF8] rounded absolute top-4 right-4 transition duration-200 cursor-pointer"
+                className="w-fit px-2 md:px-3 py-1 text-xs font-semibold text-[#0B7A60] border border-gray-200 hover:bg-[#F4FBF8] rounded absolute top-4 right-4 transition duration-200 cursor-pointer flex gap-1 items-center"
             >
-                Sample JD
+                <LuNotebookText size={14} />
+                <span className="hidden md:block">Sample</span> JD
             </button>
 
             {/* Textarea */}

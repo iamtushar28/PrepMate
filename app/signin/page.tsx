@@ -2,6 +2,7 @@ import Image from 'next/image'
 import HeroVisual from './components/HeroVisual'
 import { BsStars } from 'react-icons/bs'
 import GoogleSigninButton from './components/GoogleSigninButton'
+import Link from 'next/link'
 
 type Props = {}
 
@@ -14,7 +15,7 @@ const page = (props: Props) => {
             <HeroVisual />
 
             {/* Login section */}
-            <div className='w-full md:w-[50%] h-screen flex justify-center items-center'>
+            <div className='w-full md:w-[50%] h-screen bg-zinc-50/50 flex justify-center items-center'>
 
                 <div className='w-full md:w-[60%] hauto min-h-100 bg-white shadow border border-gray-100 rounded-2xl flex flex-col justify-center items-center'>
 
@@ -27,16 +28,17 @@ const page = (props: Props) => {
                     />
 
                     {/* logo */}
-                    <div className='md:hidden text-xl font-semibold flex gap-2 justify-center items-center mb-6'>
-                        <Image
-                            src={'/logo.png'}
-                            alt='PrepMate Logo'
-                            height={100}
-                            width={100}
-                            className='h-8 w-8'
-                        />
-                        <p>PrepMat</p>
-                        <p className='text-[#0B7A60] -rotate-12 -ml-2'>e</p>
+                    <div className='md:hidden mb-6'>
+                        <Link href={'/'} className='text-xl md:text-2xl font-semibold flex justify-center items-center'>
+                            <p>PrepMat</p>
+                            <Image
+                                src={'/logo.png'}
+                                alt='PrepMate Logo'
+                                height={100}
+                                width={100}
+                                className='h-6 w-6 ml-0.5'
+                            />
+                        </Link>
                     </div>
 
                     {/* brand strip */}
