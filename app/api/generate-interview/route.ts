@@ -103,39 +103,48 @@ estimatedLevel should be the most likely target role inferred from the job descr
                     "software-engineer"
             );
 
+            const totalQuestions =
+    (generated.technical?.length || 0) +
+    (generated.project?.length || 0) +
+    (generated.behavioral?.length || 0);
+
         await adminDb
-            .collection("interviews")
-            .doc(interviewId)
-            .set({
-                id: interviewId,
+    .collection("interviews")
+    .doc(interviewId)
+    .set({
+        id: interviewId,
 
-                userId: decodedToken.uid,
+        userId: decodedToken.uid,
 
-                status: "created",
+        status: "created",
 
-                estimatedLevel:
-                    generated.estimatedLevel,
+        estimatedLevel:
+            generated.estimatedLevel,
 
-                questions: {
-                    technical:
-                        generated.technical ||
-                        [],
-                    project:
-                        generated.project || [],
-                    behavioral:
-                        generated.behavioral ||
-                        [],
-                },
+        questions: {
+            technical:
+                generated.technical || [],
+            project:
+                generated.project || [],
+            behavioral:
+                generated.behavioral || [],
+        },
 
-                evaluation: null,
+        currentQuestionIndex: 0,
 
-                createdAt:
-                    FieldValue.serverTimestamp(),
+        totalQuestions,
 
-                startedAt: null,
+        lastActivityAt: null,
 
-                completedAt: null,
-            });
+        evaluation: null,
+
+        createdAt:
+            FieldValue.serverTimestamp(),
+
+        startedAt: null,
+
+        completedAt: null,
+    });
 
         return NextResponse.json({
             interviewId,

@@ -1,10 +1,89 @@
-import React from 'react'
+'use client'
+import React, { useEffect, useState } from 'react'
 import { FaEarListen, FaMicrophone } from 'react-icons/fa6'
 import { GoDotFill } from 'react-icons/go'
-import { RiRobot2Line } from 'react-icons/ri'
+import { RiRobot2Line, RiSpeakAiLine } from 'react-icons/ri'
+import Transcript from './Transcript'
+import MicHealth from './MicHealth'
+import { useParams } from 'next/navigation'
+
 type Props = {}
 
 const InterviewHome = (props: Props) => {
+
+    const params = useParams();
+    const interviewId = params.interviewId as string;
+
+    const [
+        currentQuestion,
+        setCurrentQuestion,
+    ] = useState("");
+
+    const [
+        currentQuestionIndex,
+        setCurrentQuestionIndex,
+    ] = useState(0);
+
+    const [
+        totalQuestions,
+        setTotalQuestions,
+    ] = useState(0);
+
+    const loadInterview =
+        async () => {
+            const response = await fetch(
+                `/api/interview/${interviewId}/session`
+            );
+
+            const data =
+                await response.json();
+
+            setCurrentQuestion(
+                data.currentQuestion.question
+            );
+
+            setCurrentQuestionIndex(
+                data.currentQuestionIndex
+            );
+
+            setTotalQuestions(
+                data.totalQuestions
+            );
+        };
+
+    useEffect(() => {
+        loadInterview();
+    }, []);
+
+    const nextQuestion =
+        async () => {
+            const response = await fetch(
+                `/api/interview/${interviewId}/next`,
+                {
+                    method: "POST",
+                }
+            );
+
+            const data =
+                await response.json();
+
+            if (data.completed) {
+                console.log(
+                    "Interview Complete"
+                );
+
+                return;
+            }
+
+            setCurrentQuestion(
+                data.currentQuestion.question
+            );
+
+            setCurrentQuestionIndex(
+                data.currentQuestionIndex
+            );
+        };
+
     return (
         <div className='pt-24 pb-8 px-4 min-h-screen h-auto w-full flex flex-col gap-10 md:gap-14 justify-center items-center relative'>
 
@@ -33,6 +112,10 @@ const InterviewHome = (props: Props) => {
                     <FaEarListen size={16} />
                     Listening...
                 </div>
+                <div className='animate-pulse -mt-3 px-6 py-2 w-fit text-sm text-[#0B7A60] border border-[#B7E4D7] bg-[#F4FBF8] rounded-full flex gap-2 justify-center items-center'>
+                    <RiSpeakAiLine size={16} />
+                    Talking...
+                </div>
 
                 {/* ai question caption */}
                 <h4 className='text-xl font-semibold w-full md:w-100 text-center'>
@@ -58,44 +141,10 @@ const InterviewHome = (props: Props) => {
             </div>
 
             {/* user mic health */}
-            <div className='w-fit px-3 py-2 bg-white shadow-sm border border-gray-50 rounded-full flex gap-2 justify-center items-center absolute bottom-4 left-4 md:bottom-10 md:left-10'>
-                <GoDotFill className='text-[#10A37F] -mr-1' />
-                Your Mic
-                <div className='flex gap-0.5 items-end justify-center'>
-                    <div className='h-1.5 w-1 bg-[#0B7A60] rounded-t-full'></div>
-                    <div className='h-2 w-1 bg-[#0b7a60c0] rounded-t-full'></div>
-                    <div className='h-3 w-1 bg-[#0b7a609a] rounded-t-full'></div>
-                </div>
-            </div>
+            <MicHealth />
 
             {/* live transcript section */}
-            <div className='hidden md:block w-60 max-h-68 h-auto p-4 bg-white border border-gray-200 shadow-xs absolute bottom-10 right-4 rounded-lg'>
-
-                <h4 className='font-semibold mb-3'>Live Transcript</h4>
-
-                <div className='text-sm flex flex-col gap-3 max-h-50 h-auto overflow-y-auto'>
-
-                    {/* AI */}
-                    <div>
-                        <p className='font-semibold text-[#0B7A60]'>AI Interviewer</p>
-                        <p className='text-gray-600'>
-                            Can you explain the virtual DOM in React and how it improves performance?
-                        </p>
-                    </div>
-
-                    {/* USER */}
-                    <div>
-                        <p className='font-semibold text-blue-600'>
-                            You
-                        </p>
-                        <p className='text-gray-600'>
-                            Sure! The virtual DOM is a lightweight...
-                        </p>
-                    </div>
-
-                </div>
-
-            </div>
+            <Transcript />
 
         </div>
     )

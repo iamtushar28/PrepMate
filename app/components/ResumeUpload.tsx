@@ -152,7 +152,7 @@ export default function ResumeUpload({
 
                                 <button
                                     type="button"
-                                    className="px-5 py-2 text-sm text-[#0B7A60] font-semibold border border-gray-200 hover:bg-[#F4FBF8] rounded-lg"
+                                    className="px-5 py-2 text-sm text-[#0B7A60] font-semibold border border-gray-200 hover:bg-[#F4FBF8] rounded-lg cursor-pointer"
                                 >
                                     Browse File
                                 </button>
