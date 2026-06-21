@@ -84,7 +84,7 @@ estimatedLevel should be the most likely target role inferred from the job descr
 
         const result =
             await ai.models.generateContent({
-                model: "gemini-2.5-flash-lite",
+                model: "gemini-2.5-flash",
                 contents: prompt,
             });
 

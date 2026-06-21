@@ -1,153 +1,174 @@
-'use client'
-import React, { useEffect, useState } from 'react'
-import { FaEarListen, FaMicrophone } from 'react-icons/fa6'
-import { GoDotFill } from 'react-icons/go'
-import { RiRobot2Line, RiSpeakAiLine } from 'react-icons/ri'
-import Transcript from './Transcript'
-import MicHealth from './MicHealth'
-import { useParams } from 'next/navigation'
+'use client';
 
-type Props = {}
+import React from 'react';
+import { useParams } from 'next/navigation';
+import { FaMicrophone, FaStop } from 'react-icons/fa6';
+import { GoDotFill } from 'react-icons/go';
+import { RiRobot2Line, RiSpeakAiLine } from 'react-icons/ri';
+import { FaEarListen } from 'react-icons/fa6';
+
+import MicHealth from './MicHealth';
+
+import { useInterview } from '@/hooks/useInterview';
+import Transcript from '@/components/interview/Transcript';
+
+type Props = {};
 
 const InterviewHome = (props: Props) => {
-
     const params = useParams();
-    const interviewId = params.interviewId as string;
 
-    const [
-        currentQuestion,
-        setCurrentQuestion,
-    ] = useState("");
+    const interviewId =
+        params.interviewId as string;
 
-    const [
-        currentQuestionIndex,
-        setCurrentQuestionIndex,
-    ] = useState(0);
+    const interview =
+        useInterview(interviewId);
 
-    const [
-        totalQuestions,
-        setTotalQuestions,
-    ] = useState(0);
-
-    const loadInterview =
-        async () => {
-            const response = await fetch(
-                `/api/interview/${interviewId}/session`
-            );
-
-            const data =
-                await response.json();
-
-            setCurrentQuestion(
-                data.currentQuestion.question
-            );
-
-            setCurrentQuestionIndex(
-                data.currentQuestionIndex
-            );
-
-            setTotalQuestions(
-                data.totalQuestions
-            );
-        };
-
-    useEffect(() => {
-        loadInterview();
-    }, []);
-
-    const nextQuestion =
-        async () => {
-            const response = await fetch(
-                `/api/interview/${interviewId}/next`,
-                {
-                    method: "POST",
-                }
-            );
-
-            const data =
-                await response.json();
-
-            if (data.completed) {
-                console.log(
-                    "Interview Complete"
-                );
-
-                return;
-            }
-
-            setCurrentQuestion(
-                data.currentQuestion.question
-            );
-
-            setCurrentQuestionIndex(
-                data.currentQuestionIndex
-            );
-        };
+    const status = interview.isSpeaking
+        ? "speaking"
+        : interview.isListening
+            ? "listening"
+            : interview.isProcessing
+                ? "processing"
+                : "idle";
 
     return (
         <div className='pt-24 pb-8 px-4 min-h-screen h-auto w-full flex flex-col gap-10 md:gap-14 justify-center items-center relative'>
 
-            {/* interview title */}
+            {/* Mobile Title */}
             <div className='md:hidden flex flex-col items-center'>
 
-                <h4 className='font-semibold'>Software Engineer Interview</h4>
+                <h4 className='font-semibold'>
+                    Software Engineer Interview
+                </h4>
 
                 <div className='text-sm text-gray-500 flex gap-1 items-center'>
                     <GoDotFill className='text-[#10A37F] animate-pulse' />
-                    <p>In progress</p>
+                    <p>In Progress</p>
                 </div>
 
             </div>
 
-            {/* ai visual section */}
+            {/* AI Section */}
             <div className='w-full flex flex-col gap-5 justify-center items-center'>
 
-                <RiRobot2Line size={38} color='#0B7A60' />
+                <RiRobot2Line
+                    size={38}
+                    color='#0B7A60'
+                />
 
                 <h4 className='-mt-2 font-semibold text-[#10A37F]'>
                     AI Interviewer
                 </h4>
 
-                <div className='animate-pulse -mt-3 px-6 py-2 w-fit text-sm text-[#0B7A60] border border-[#B7E4D7] bg-[#F4FBF8] rounded-full flex gap-2 justify-center items-center'>
-                    <FaEarListen size={16} />
-                    Listening...
-                </div>
-                <div className='animate-pulse -mt-3 px-6 py-2 w-fit text-sm text-[#0B7A60] border border-[#B7E4D7] bg-[#F4FBF8] rounded-full flex gap-2 justify-center items-center'>
-                    <RiSpeakAiLine size={16} />
-                    Talking...
+                {/* Recording */}
+                <div className='px-6 py-2 rounded-full bg-green-50 border border-green-200 text-green-600 flex gap-2 items-center'>
+
+                    {status === "speaking" && (
+                        <>
+                            <RiSpeakAiLine />
+                            AI Speaking...
+                        </>
+                    )}
+
+                    {status === "listening" && (
+                        <>
+                            <FaEarListen />
+                            Listening...
+                        </>
+                    )}
+
+                    {status === "processing" && (
+                        <>
+                            Processing Answer...
+                        </>
+                    )}
+
+                    {status === "idle" && (
+                        <>
+                            Idle
+                        </>
+                    )}
+
                 </div>
 
-                {/* ai question caption */}
-                <h4 className='text-xl font-semibold w-full md:w-100 text-center'>
-                    Can you explain the virtual DOM in React and how it improves performance?
+                {/* Question */}
+                <h4 className='text-xl font-semibold w-full md:w-125 text-center'>
+                    {interview.currentQuestion}
                 </h4>
 
+                {/* Progress */}
+                <p className='text-sm text-gray-500'>
+                    Question{" "}
+                    {interview.currentQuestionIndex + 1}
+                    {" / "}
+                    {interview.totalQuestions}
+                </p>
+
             </div>
 
-            {/* user visual section */}
+            {/* User Section */}
             <div>
 
-                {/* mic */}
-                <div className='flex flex-col gap-2 justify-between items-center'>
+                <div className='flex flex-col gap-2 justify-center items-center'>
+
                     <div className='h-17 w-17 bg-[#0b7a6018] shadow flex justify-center items-center rounded-full'>
-                        <button className='h-14 w-14 text-xl text-white bg-[#0B7A60] hover:bg-[#0E8F70] rounded-full flex justify-center items-center cursor-pointer transition duration-200'>
-                            <FaMicrophone />
+
+                        <button
+                            onClick={() => {
+
+                                if (
+                                    interview.isRecording
+                                ) {
+                                    interview.stopRecording();
+                                } else {
+                                    interview.startRecording();
+                                }
+                            }}
+                            disabled={
+                                interview.isSpeaking ||
+                                interview.isProcessing
+                            }
+                            className="h-14 w-14 text-xl text-white rounded-full flex justify-center items-center transition duration-200 bg-[#0B7A60] hover:bg-[#0E8F70] cursor-pointer"
+                        >
+                            {interview.isRecording
+                                ?
+                                <FaStop />
+                                :
+                                <FaMicrophone />
+                            }
                         </button>
+
                     </div>
 
-                    <p className='text-sm text-gray-500'>Click to speak</p>
+                    <p className='text-sm text-gray-500'>
+                        {
+                            interview.isRecording
+                                ? <span className='animate-pulse'>Click to stop recording</span>
+                                : "Click to start recording"
+                        }
+                    </p>
+
+                    {interview.isRecording && interview.transcript && (
+                        <p className='md:w-127 text-sm text-gray-500 text-center'>
+                            {interview.transcript}
+                        </p>
+                    )}
                 </div>
 
             </div>
 
-            {/* user mic health */}
+            {/* Mic Health */}
             <MicHealth />
 
-            {/* live transcript section */}
-            <Transcript />
+            {/* Future Transcript Panel */}
+            <Transcript
+                messages={
+                    interview.transcriptMessages
+                }
+            />
 
         </div>
-    )
-}
+    );
+};
 
-export default InterviewHome
+export default InterviewHome;
