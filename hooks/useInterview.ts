@@ -1,309 +1,256 @@
-'use client';
+"use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { speak } from "@/lib/speak";
+import { saveConversation } from "@/services/transcript.service";
 import { useSpeechRecognition } from "@/hooks/useSpeechRecognition";
 
-import type {
-    TranscriptMessage,
-} from "@/components/interview/Transcript";
-
-export const useInterview = (
-    interviewId: string
-) => {
-
-    const [
-        currentQuestion,
-        setCurrentQuestion
-    ] = useState("");
-
-    const [
-        currentQuestionIndex,
-        setCurrentQuestionIndex
-    ] = useState(0);
-
-    const [
-        totalQuestions,
-        setTotalQuestions
-    ] = useState(0);
-
-    const [
-        isSpeaking,
-        setIsSpeaking
-    ] = useState(false);
-
-    const [
-        isProcessing,
-        setIsProcessing
-    ] = useState(false);
-
-    const [
-        isRecording,
-        setIsRecording
-    ] = useState(false);
-
-    const [
-        transcriptMessages,
-        setTranscriptMessages,
-    ] = useState<
-        TranscriptMessage[]
-    >([]);
-
-    const {
-        transcript,
-        isListening,
-        startListening,
-        stopListening,
-        clearTranscript,
-    } = useSpeechRecognition();
-
-    const loadInterview =
-        async () => {
-
-            try {
-
-                const response =
-                    await fetch(
-                        `/api/interview/${interviewId}/session`
-                    );
-
-                const data =
-                    await response.json();
-
-                setCurrentQuestion(
-                    data.currentQuestion.question
-                );
-
-                setCurrentQuestionIndex(
-                    data.currentQuestionIndex
-                );
-
-                setTotalQuestions(
-                    data.totalQuestions
-                );
-
-            } catch (error) {
-                console.error(
-                    "Failed to load interview",
-                    error
-                );
-            }
-        };
-
-    const askQuestion =
-        async (
-            question: string
-        ) => {
-
-            setTranscriptMessages(
-                prev => [
-                    ...prev,
-                    {
-                        role: "ai",
-                        text: question,
-                    },
-                ]
-            );
-
-            setIsSpeaking(true);
-
-            await speak(
-                question
-            );
-
-            setIsSpeaking(false);
-        };
-
-    const handleAnswer =
-        async (
-            answer: string
-        ) => {
-
-            if (!answer.trim())
-                return;
-
-            try {
-
-                setTranscriptMessages(
-                    prev => [
-                        ...prev,
-                        {
-                            role: "user",
-                            text: answer,
-                        },
-                    ]
-                );
-
-                setIsProcessing(true);
-
-                const response =
-                    await fetch(
-                        `/api/interview/${interviewId}/answer`,
-                        {
-                            method: "POST",
-
-                            headers: {
-                                "Content-Type":
-                                    "application/json",
-                            },
+import type { TranscriptMessage } from "@/components/interview/Transcript";
+import { useToastStore } from "@/store/toast-store";
 
-                            body: JSON.stringify({
-                                question:
-                                    currentQuestion,
+export const useInterview = (interviewId: string) => {
+  const router = useRouter();
+  const { showToast } = useToastStore();
 
-                                answer,
-                            }),
-                        }
-                    );
+  const [currentQuestion, setCurrentQuestion] = useState("");
 
-                const data =
-                    await response.json();
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
 
-                setIsProcessing(false);
+  const [totalQuestions, setTotalQuestions] = useState(0);
 
-                setIsSpeaking(true);
+  const [isSpeaking, setIsSpeaking] = useState(false);
 
-                await speak(
-                    data.acknowledgement
-                );
+  const [isProcessing, setIsProcessing] = useState(false);
 
-                setIsSpeaking(false);
+  const [isRecording, setIsRecording] = useState(false);
 
-                const nextResponse =
-                    await fetch(
-                        `/api/interview/${interviewId}/next`,
-                        {
-                            method: "POST",
-                        }
-                    );
+  const [answer, setAnswer] = useState("");
 
-                const nextData =
-                    await nextResponse.json();
+  const [transcriptMessages, setTranscriptMessages] = useState<
+    TranscriptMessage[]
+  >([]);
 
-                if (
-                    nextData.completed
-                ) {
+  const {
+    transcript,
+    isListening,
+    startListening,
+    stopListening,
+    clearTranscript,
+  } = useSpeechRecognition();
 
-                    setTranscriptMessages(
-                        prev => [
-                            ...prev,
-                            {
-                                role: "ai",
-                                text:
-                                    "Interview completed. Thank you.",
-                            },
-                        ]
-                    );
+  const loadInterview = async () => {
+    try {
+      const response = await fetch(`/api/interview/${interviewId}/session`);
 
-                    await speak(
-                        "Interview completed. Thank you."
-                    );
+      if (!response.ok) {
+        throw new Error("Failed to load interview session.");
+      }
 
-                    return;
-                }
+      const data = await response.json();
 
-                setCurrentQuestion(
-                    nextData.currentQuestion
-                        .question
-                );
+      setCurrentQuestion(data.currentQuestion.question);
 
-                setCurrentQuestionIndex(
-                    nextData.currentQuestionIndex
-                );
+      setCurrentQuestionIndex(data.currentQuestionIndex);
 
-            } catch (error) {
+      setTotalQuestions(data.totalQuestions);
+    } catch (error) {
+      console.error("Failed to load interview", error);
 
-                console.error(
-                    "Failed to process answer",
-                    error
-                );
+      showToast("Failed to load interview.", "error");
+    }
+  };
 
-                setIsProcessing(
-                    false
-                );
+  const askQuestion = async (question: string) => {
+    setTranscriptMessages((prev) => [
+      ...prev,
+      {
+        role: "ai",
+        text: question,
+      },
+    ]);
 
-                setIsSpeaking(
-                    false
-                );
-            }
-        };
+    setIsSpeaking(true);
 
-    const startRecording =
-        () => {
+    await speak(question);
 
-            clearTranscript();
+    setIsSpeaking(false);
+  };
 
-            setIsRecording(
-                true
-            );
+  const handleAnswer = async (answer: string) => {
+    if (!answer.trim()) return;
 
-            startListening();
-        };
+    try {
+      setTranscriptMessages((prev) => [
+        ...prev,
+        {
+          role: "user",
+          text: answer,
+        },
+      ]);
 
-    const stopRecording =
-        async () => {
+      setIsProcessing(true);
 
-            stopListening();
+      const response = await fetch(`/api/interview/${interviewId}/answer`, {
+        method: "POST",
 
-            setIsRecording(
-                false
-            );
+        headers: {
+          "Content-Type": "application/json",
+        },
 
-            const answer =
-                transcript.trim();
+        body: JSON.stringify({
+          question: currentQuestion,
+          answer,
+        }),
+      });
 
-            if (!answer)
-                return;
+      if (!response.ok) {
+        throw new Error("Failed to process answer.");
+      }
 
-            await handleAnswer(
-                answer
-            );
-        };
+      const data = await response.json();
 
-    useEffect(() => {
+      setIsProcessing(false);
 
-        if (
-            !interviewId
-        ) return;
+      setIsSpeaking(true);
 
-        loadInterview();
+      await speak(data.acknowledgement);
 
-    }, [interviewId]);
+      setIsSpeaking(false);
 
-    useEffect(() => {
+      const nextResponse = await fetch(`/api/interview/${interviewId}/next`, {
+        method: "POST",
+      });
 
-        if (
-            !currentQuestion
-        ) return;
+      if (!nextResponse.ok) {
+        throw new Error("Failed to load next question.");
+      }
 
-        askQuestion(
-            currentQuestion
-        );
+      const nextData = await nextResponse.json();
 
-    }, [currentQuestion]);
+      if (nextData.completed) {
+        const completionMessage = "Interview completed. Thank you.";
 
-    return {
+        setTranscriptMessages((prev) => [
+          ...prev,
+          {
+            role: "ai",
+            text: completionMessage,
+          },
+        ]);
 
-        currentQuestion,
+        setIsSpeaking(true);
 
-        currentQuestionIndex,
+        await speak(completionMessage);
 
-        totalQuestions,
+        setIsSpeaking(false);
 
-        transcript,
+        router.replace(`/feedback/${interviewId}`);
 
-        transcriptMessages,
+        return;
+      }
 
-        isListening,
+      setCurrentQuestion(nextData.currentQuestion.question);
 
-        isSpeaking,
+      setCurrentQuestionIndex(nextData.currentQuestionIndex);
+    } catch (error) {
+      console.error("Failed to process answer", error);
 
-        isProcessing,
+      setIsProcessing(false);
 
-        isRecording,
+      setIsSpeaking(false);
+    }
+  };
 
-        startRecording,
+  const startRecording = () => {
+    clearTranscript();
 
-        stopRecording,
-    };
+    setAnswer("");
+
+    setIsRecording(true);
+
+    startListening();
+  };
+
+  const stopRecording = () => {
+    stopListening();
+
+    setIsRecording(false);
+
+    setAnswer(transcript);
+  };
+
+  useEffect(() => {
+    if (!interviewId) return;
+
+    loadInterview();
+  }, [interviewId]);
+
+  useEffect(() => {
+    if (!currentQuestion) return;
+
+    askQuestion(currentQuestion);
+  }, [currentQuestion]);
+
+  const submitAnswer = async () => {
+    const finalAnswer = answer.trim();
+
+    if (!finalAnswer) return;
+
+    try {
+      await saveConversation(interviewId, {
+        questionIndex: currentQuestionIndex,
+        question: currentQuestion,
+        answer: finalAnswer,
+      });
+
+      await handleAnswer(finalAnswer);
+
+      clearTranscript();
+
+      setAnswer("");
+    } catch (error) {
+      console.error("Failed to save conversation", error);
+    }
+  };
+
+  const clearAnswer = () => {
+    clearTranscript();
+
+    setAnswer("");
+  };
+
+  return {
+    currentQuestion,
+
+    currentQuestionIndex,
+
+    totalQuestions,
+
+    // Live speech transcript (optional, useful for debugging)
+    transcript,
+
+    // Editable answer
+    answer,
+
+    setAnswer,
+
+    transcriptMessages,
+
+    isListening,
+
+    isSpeaking,
+
+    isProcessing,
+
+    isRecording,
+
+    startRecording,
+
+    stopRecording,
+
+    submitAnswer,
+
+    clearAnswer,
+  };
 };
